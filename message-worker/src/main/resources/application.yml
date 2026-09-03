@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: message-worker
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/messages}
+    username: ${DB_USERNAME:messages}
+    password: ${DB_PASSWORD:messages}
+  jpa:
+    hibernate:
+      ddl-auto: update
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: message-worker
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.value.default.type: com.example.messageworker.domain.MessageCommand
+        spring.json.trusted.packages: com.example.messageworker.domain
+        spring.json.use.type.headers: false
+        max.poll.records: 500
+    listener:
+      concurrency: 3
